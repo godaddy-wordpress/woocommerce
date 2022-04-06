@@ -68,7 +68,7 @@ const LearnMore = () => {
 	);
 };
 
-const PaymentMethods = () => (
+export const PaymentMethods = () => (
 	<div className="wcpay-connect-account-page-payment-methods">
 		<Visa />
 		<MasterCard />
