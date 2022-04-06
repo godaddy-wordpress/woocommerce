@@ -37,7 +37,7 @@ const maybeThrowError = ( error ) => {
 		const from = path.join( __dirname, file );
 		const to = path.join(
 			folder,
-			'_main.php' === file
+			file === '_main.php'
 				? `${ extensionSlug }.php`
 				: file.replace( '_', '' )
 		);

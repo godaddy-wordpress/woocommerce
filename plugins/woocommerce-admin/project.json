@@ -37,6 +37,12 @@
 			"options": {
 				"script": "lint"
 			}
+		},
+		"create-wc-extension": {
+			"executor": "@nrwl/workspace:run-script",
+			"options": {
+				"script": "create-wc-extension"
+			}
 		}
 	}
 }
