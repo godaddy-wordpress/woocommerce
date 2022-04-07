@@ -11,6 +11,7 @@ const files = [
 	'_package.json',
 	'._eslintrc.js',
 	'._prettierrc.json',
+	'._wp-env.json',
 ];
 const maybeThrowError = ( error ) => {
 	if ( error ) throw error;

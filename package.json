@@ -14,7 +14,8 @@
     "url": "https://github.com/woocommerce/woocommerce/issues"
   },
   "scripts": {
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "create-extension": "node ./tools/create-extension/index.js"
   },
   "devDependencies": {
     "@automattic/nx-composer": "^0.1.0",
@@ -42,6 +43,7 @@
     "@wordpress/babel-plugin-import-jsx-pragma": "^3.1.0",
     "@wordpress/babel-preset-default": "^6.4.1",
     "lodash": "^4.17.21",
+    "promptly": "^3.2.0",
     "wp-textdomain": "1.0.1"
   }
 }
