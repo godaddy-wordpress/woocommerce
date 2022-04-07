@@ -60,8 +60,8 @@ class WC_Product_Download_Test extends WC_Unit_Test_Case {
 		wp_set_current_user( $non_admin_user );
 		$download = new WC_Product_Download();
 		$download->set_file( $podcast_url );
-		$this->expectExceptionMessage( 'cannot be used: it is not located in an approved directory' );
 		$download->check_is_valid();
+		$this->assertFalse( $download_directories->is_valid_path( $podcast_url ), 'Verify podcast path is invalid (not yet approved by an admin level user).' );
 	}
 
 	/**

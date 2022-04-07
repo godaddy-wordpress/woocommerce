@@ -1206,40 +1206,80 @@ class WC_Product extends WC_Abstract_Legacy_Product {
 	 * @param array $downloads_array Array of WC_Product_Download objects or arrays.
 	 */
 	public function set_downloads( $downloads_array ) {
-		$downloads = array();
-		$errors    = array();
+		// When the object is first hydrated, only the previously persisted downloads will be passed in.
+		$existing_downloads = $this->get_object_read() ? (array) $this->get_prop( 'downloads' ) : $downloads_array;
+		$downloads          = array();
+		$errors             = array();
+
+		$downloads_array    = $this->build_downloads_map( $downloads_array );
+		$existing_downloads = $this->build_downloads_map( $existing_downloads );
 
 		foreach ( $downloads_array as $download ) {
-			if ( is_a( $download, 'WC_Product_Download' ) ) {
-				$download_object = $download;
-			} else {
-				$download_object = new WC_Product_Download();
-
-				// If we don't have a previous hash, generate UUID for download.
-				if ( empty( $download['download_id'] ) ) {
-					$download['download_id'] = wp_generate_uuid4();
-				}
-
-				$download_object->set_id( $download['download_id'] );
-				$download_object->set_name( $download['name'] );
-				$download_object->set_file( $download['file'] );
-			}
+   			$download_id = $download->get_id();
 
 			try {
-				$download_object->check_is_valid();
-				$downloads[ $download_object->get_id() ] = $download_object;
+				$download->check_is_valid( $this->get_object_read() );
+				$downloads[ $download_id ] = $download;
 			} catch ( Exception $e ) {
-				if ( $this->get_object_read() ) {
-					$errors[] = $e->getMessage();
+				$errors[] = $e->getMessage();
+
+				// If the download had already been stored but only now has become disabled (this could be due to a
+				// change in allowed filetypes, or to the list of Approved Download Directories) then move it to a list
+				// of disabled downloads.
+				if ( ! $download->get_enabled() || isset( $existing_downloads[ $download_id ] ) ) {
+					$download->set_enabled( false );
+					$downloads[ $download_id ] = $download;
 				}
 			}
 		}
 
-		if ( $errors ) {
+		if ( $errors && $this->get_object_read() ) {
 			$this->error( 'product_invalid_download', $errors[0] );
 		}
 
 		$this->set_prop( 'downloads', $downloads );
+	}
+
+	/**
+	 * Takes an array of downloadable file representations and converts it into an array of
+	 * WC_Product_Download objects, indexed by download ID.
+	 *
+	 * @param array[]|WC_Product_Download[] $downloads
+	 *
+	 * @return WC_Product_Download[]
+	 */
+	private function build_downloads_map( array $downloads ): array {
+		$downloads_map = array();
+
+		foreach ( $downloads as $download_data ) {
+			// If the item is already a WC_Product_Download we can add it to the map and move on.
+			if ( is_a( $download_data, 'WC_Product_Download' ) ) {
+				$downloads_map[ $download_data->get_id() ] = $download_data;
+				continue;
+			}
+
+			// If the item is not an array, there is nothing else we can do (bad data).
+			if ( ! is_array( $download_data ) ) {
+				continue;
+			}
+
+			// Otherwise, transform the array to a WC_Product_Download and add to the map.
+			$download_object = new WC_Product_Download();
+
+			// If we don't have a previous hash, generate UUID for download.
+			if ( empty( $download_data['download_id'] ) ) {
+				$download_data['download_id'] = wp_generate_uuid4();
+			}
+
+			$download_object->set_id( $download_data['download_id']  );
+			$download_object->set_name( $download_data['name'] );
+			$download_object->set_file( $download_data['file'] );
+			$download_object->set_enabled( isset( $download_data['enabled'] ) ? $download_data['enabled'] : true );
+
+			$downloads_map[ $download_object->get_id() ] = $download_object;
+		}
+
+		return $downloads_map;
 	}
 
 	/**

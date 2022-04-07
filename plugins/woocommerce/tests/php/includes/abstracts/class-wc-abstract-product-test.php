@@ -36,17 +36,17 @@ class WC_Abstract_Product_Test extends WC_Unit_Test_Case {
 		);
 
 		$download_directories->disable_by_id( $problematic_file_source_id );
+		$product_downloads = wc_get_product( $product->get_id() )->get_downloads();
 
 		$this->assertCount(
-			1,
-			wc_get_product( $product->get_id() )->get_downloads(),
-			'If a trusted download directory is disabled, we expect any individual download files from that location will not be listed.'
+			2,
+			$product_downloads,
+			'If a trusted download directory rule is disabled, we still expect it to be fetched.'
 		);
 
-		$this->assertEquals(
-			'Book 1',
-			current( wc_get_product( $product->get_id() )->get_downloads() )->get_name(),
-			'Only individual download files that are stored in trusted locations will be fetched.'
+		$this->assertFalse(
+			next( $product_downloads )->get_enabled(),
+			'If a trusted download directory rule is disabled, corresponding product downloads will also be marked as disabled.'
 		);
 
 		$download_directories->set_mode( Download_Directories::MODE_DISABLED );
@@ -54,7 +54,7 @@ class WC_Abstract_Product_Test extends WC_Unit_Test_Case {
 		$this->assertCount(
 			2,
 			wc_get_product( $product->get_id() )->get_downloads(),
-			'If the Approved Download Directories system is completely disabled, we expect all product downloads to be fetched irrespective of where they are stored.'
+			'Disabling the Approved Download Directories system entirely does not impact our ability to fetch product downloads.'
 		);
 	}
 }

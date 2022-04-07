@@ -127,12 +127,7 @@ class WC_Tests_Product_CSV_Importer extends WC_Unit_Test_Case {
 
 		$this->assertEquals( 0, count( $results['updated'] ) );
 		$this->assertEquals( 0, count( $results['skipped'] ) );
-		$this->assertEquals( 6, count( $results['imported'] ) );
-		$this->assertEquals(
-			1,
-			count( $results['failed'] ),
-			'One import item references a downloadable file stored in an unapproved location: if the import is triggered by a non-admin, that item cannot be imported.'
-		);
+		$this->assertEquals( 7, count( $results['imported'] ) );
 	}
 
 	/**
