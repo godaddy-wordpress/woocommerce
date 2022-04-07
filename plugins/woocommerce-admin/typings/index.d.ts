@@ -10,3 +10,8 @@ declare module 'gridicons/dist/*' {
 	} >;
 	export default value;
 }
+
+declare module '*.svg' {
+	const content: any;
+	export default content;
+}

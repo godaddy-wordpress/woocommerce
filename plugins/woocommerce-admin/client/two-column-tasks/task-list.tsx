@@ -30,6 +30,9 @@ import DismissModal from './dismiss-modal';
 import TaskListCompleted from './completed';
 import { TaskListProps } from '~/tasks/task-list';
 import { ProgressHeader } from '~/task-lists/progress-header';
+import { TaskListCompletedHeaderWithCES } from './completed-header-with-ces';
+
+export const ALLOW_TRACKING_OPTION_NAME = 'woocommerce_allow_tracking';
 
 export const TaskList: React.FC< TaskListProps > = ( {
 	query,
@@ -40,14 +43,17 @@ export const TaskList: React.FC< TaskListProps > = ( {
 	keepCompletedTaskList,
 	isComplete,
 	displayProgressHeader,
+	cesHeader = true,
 } ) => {
 	const { createNotice } = useDispatch( 'core/notices' );
 	const { updateOptions, dismissTask, undoDismissTask } = useDispatch(
 		OPTIONS_STORE_NAME
 	);
-	const { profileItems } = useSelect( ( select ) => {
+	const { profileItems, allowTracking } = useSelect( ( select ) => {
 		const { getProfileItems } = select( ONBOARDING_STORE_NAME );
+		const { getOption } = select( OPTIONS_STORE_NAME );
 		return {
+			allowTracking: getOption( ALLOW_TRACKING_OPTION_NAME ) === 'yes',
 			profileItems: getProfileItems(),
 		};
 	} );
@@ -248,11 +254,19 @@ export const TaskList: React.FC< TaskListProps > = ( {
 	if ( isComplete && ! keepCompletedTaskList ) {
 		return (
 			<>
-				<TaskListCompleted
-					hideTasks={ hideTasks }
-					keepTasks={ keepTasks }
-					twoColumns={ false }
-				/>
+				{ cesHeader ? (
+					<TaskListCompletedHeaderWithCES
+						hideTasks={ hideTasks }
+						keepTasks={ keepTasks }
+						allowTracking={ allowTracking }
+					/>
+				) : (
+					<TaskListCompleted
+						hideTasks={ hideTasks }
+						keepTasks={ keepTasks }
+						twoColumns={ false }
+					/>
+				) }
 			</>
 		);
 	}
