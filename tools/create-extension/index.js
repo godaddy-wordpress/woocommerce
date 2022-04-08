@@ -80,10 +80,11 @@ const maybeThrowError = ( error ) => {
 	process.stdout.write( '\n' );
 	console.log(
 		chalk.green(
-			'Run the following commands from the root of the extension and activate the plugin.'
+			'Run the following commands from the root of the extension to scaffold a dev environment.'
 		)
 	);
 	process.stdout.write( '\n' );
+	console.log( 'wp-env start' );
 	console.log( 'pnpm install' );
 	console.log( 'pnpm start' );
 	process.stdout.write( '\n' );
