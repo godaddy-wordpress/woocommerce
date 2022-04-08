@@ -121,7 +121,7 @@ export const TaskList: React.FC< TaskListProps > = ( {
 		}
 	};
 
-	const hideTasks = ( event: string ) => {
+	const hideTasks = () => {
 		hideTaskList( id );
 	};
 
