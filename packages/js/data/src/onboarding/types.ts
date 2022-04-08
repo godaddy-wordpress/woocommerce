@@ -25,4 +25,5 @@ export type TaskListType = {
 	title: string;
 	eventPrefix: string;
 	displayProgressHeader: boolean;
+	showCESFeedback: boolean;
 };

@@ -24,7 +24,7 @@ export type TaskListProps = TaskListType & {
 	};
 	eventName?: string;
 	twoColumns?: boolean;
-	keepCompletedTaskList?: boolean;
+	keepCompletedTaskList?: 'yes' | 'no';
 	cesHeader?: boolean;
 };
 

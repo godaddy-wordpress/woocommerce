@@ -339,6 +339,20 @@ class TaskList {
 	}
 
 	/**
+	 * Returns option to keep completed task list.
+	 *
+	 * @return string
+	 */
+	public function show_ces_feedback() {
+		if ( ! $this->is_complete() ) {
+			return false;
+		}
+		$allow_tracking = 'yes' === get_option( 'woocommerce_allow_tracking' );
+		$shown_ces_actions = get_option( 'woocommerce_ces_shown_for_actions', array() );
+		return $allow_tracking && ! in_array( 'store_setup', $shown_ces_actions, true );
+	}
+
+	/**
 	 * Remove reminder bar four weeks after store creation.
 	 */
 	public static function possibly_remove_reminder_bar() {
@@ -374,6 +388,7 @@ class TaskList {
 			'eventPrefix'           => $this->prefix_event( '' ),
 			'displayProgressHeader' => $this->display_progress_header,
 			'keepCompletedTaskList' => $this->get_keep_completed_task_list(),
+			'showCESFeedback'       => $this->show_ces_feedback(),
 		);
 	}
 }
