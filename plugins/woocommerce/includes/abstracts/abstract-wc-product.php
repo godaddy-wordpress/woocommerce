@@ -1215,7 +1215,7 @@ class WC_Product extends WC_Abstract_Legacy_Product {
 		$existing_downloads = $this->build_downloads_map( $existing_downloads );
 
 		foreach ( $downloads_array as $download ) {
-   			$download_id = $download->get_id();
+			$download_id = $download->get_id();
 
 			try {
 				$download->check_is_valid( $this->get_object_read() );
@@ -1244,7 +1244,7 @@ class WC_Product extends WC_Abstract_Legacy_Product {
 	 * Takes an array of downloadable file representations and converts it into an array of
 	 * WC_Product_Download objects, indexed by download ID.
 	 *
-	 * @param array[]|WC_Product_Download[] $downloads
+	 * @param array[]|WC_Product_Download[] $downloads Download data to be re-mapped.
 	 *
 	 * @return WC_Product_Download[]
 	 */
@@ -1271,7 +1271,7 @@ class WC_Product extends WC_Abstract_Legacy_Product {
 				$download_data['download_id'] = wp_generate_uuid4();
 			}
 
-			$download_object->set_id( $download_data['download_id']  );
+			$download_object->set_id( $download_data['download_id'] );
 			$download_object->set_name( $download_data['name'] );
 			$download_object->set_file( $download_data['file'] );
 			$download_object->set_enabled( isset( $download_data['enabled'] ) ? $download_data['enabled'] : true );

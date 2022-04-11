@@ -1,6 +1,13 @@
 <?php
 /**
- * @var bool $disabled_download
+ * Template used to form individual rows within the downloadable files table for variables.
+ *
+ * @package WooCommerce\Admin\Views
+ *
+ * @var bool   $disabled_download Indicates if the current downloadable file is disabled.
+ * @var array  $file              Product download data.
+ * @var string $key               Product download key.
+ * @var int    $variation_id      Variation ID.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -14,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</td>
 	<td class="file_url">
 		<input type="text" class="input_text" placeholder="<?php esc_attr_e( 'http://', 'woocommerce' ); ?>" name="_wc_variation_file_urls[<?php echo esc_attr( $variation_id ); ?>][]" value="<?php echo esc_attr( $file['file'] ); ?>" />
-		<?php if ( $disabled_download ): ?>
+		<?php if ( $disabled_download ) : ?>
 			<span class="disabled">*</span>
 		<?php endif; ?>
 	</td>

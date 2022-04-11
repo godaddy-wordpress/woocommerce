@@ -18,16 +18,18 @@ class WC_Abstract_Product_Test extends WC_Unit_Test_Case {
 		$download_directories->add_approved_directory( 'https://always.trusted/' );
 		$problematic_file_source_id = $download_directories->add_approved_directory( 'https://new.supplier/' );
 
-		$product = WC_Helper_Product::create_downloadable_product( array(
+		$product = WC_Helper_Product::create_downloadable_product(
 			array(
-				'name' => 'Book 1',
-				'file' => 'https://always.trusted/123.pdf'
-			),
-			array(
-				'name' => 'Book 2',
-				'file' => 'https://new.supplier/456.pdf'
-			),
-		) );
+				array(
+					'name' => 'Book 1',
+					'file' => 'https://always.trusted/123.pdf',
+				),
+				array(
+					'name' => 'Book 2',
+					'file' => 'https://new.supplier/456.pdf',
+				),
+			)
+		);
 
 		$this->assertCount(
 			2,

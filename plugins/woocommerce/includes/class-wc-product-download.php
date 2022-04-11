@@ -235,7 +235,7 @@ class WC_Product_Download implements ArrayAccess {
 				// Add the parent URL to the approved directories list, but *do not enable it* unless the current user is a site admin.
 				$download_directories->add_approved_directory( ( new URL( $download_file ) )->get_parent_url(), $is_site_administrator );
 				$valid_storage_directory = true;
-			} catch ( Exception $e ) {
+			} catch ( Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 				// At this point, $valid_storage_directory will be false. Fall-through so the appropriate exception is
 				// triggered (same as if the storage directory was invalid and $auto_add_to_approved_directory_list was false.
 			}
@@ -313,7 +313,7 @@ class WC_Product_Download implements ArrayAccess {
 	/**
 	 * Sets the status of the download to enabled (true) or disabled (false).
 	 *
-	 * @param bool $enabled
+	 * @param bool $enabled True indicates the downloadable file is enabled, false indicates it is disabled.
 	 */
 	public function set_enabled( bool $enabled = true ) {
 		$this->data['enabled'] = $enabled;

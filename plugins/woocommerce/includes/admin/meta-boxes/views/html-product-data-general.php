@@ -123,7 +123,7 @@ defined( 'ABSPATH' ) || exit;
 								<?php
 									printf(
 										/* translators: 1: opening link tag, 2: closing link tag. */
-										__( 'The indicated downloads have been disabled (invalid location or filetype&mdash;%1$slearn more%2$s).', 'woocommerce' ),
+										esc_html__( 'The indicated downloads have been disabled (invalid location or filetype&mdash;%1$slearn more%2$s).', 'woocommerce' ),
 										'<a href="https://woocommerce.com/document/approved-download-directories" target="_blank">',
 										'</a>'
 									);
