@@ -179,6 +179,7 @@ class ReviewsTest extends WC_Unit_Test_Case {
 	 * @covers \Automattic\WooCommerce\Internal\Admin\ProductReviews\Reviews::edit_review_parent_file()
 	 *
 	 * @return void
+	 * @throws ReflectionException If the method doesn't exist.
 	 */
 	public function test_edit_review_parent_file() : void {
 		global $submenu_file, $current_screen;
@@ -189,7 +190,10 @@ class ReviewsTest extends WC_Unit_Test_Case {
 		$_GET['c'] = $review;
 		$reviews = new Reviews();
 
-		$this->assertSame( 'edit.php?post_type=product', $reviews->edit_review_parent_file( 'test' ) );
+		$method = ( new ReflectionClass( $reviews ) )->getMethod( 'edit_review_parent_file' );
+		$method->setAccessible( true );
+
+		$this->assertSame( 'edit.php?post_type=product', $method->invoke( $method, 'test' ) );
 		$this->assertSame( 'product-reviews', $submenu_file );
 	}
 
@@ -206,6 +210,7 @@ class ReviewsTest extends WC_Unit_Test_Case {
 	 * @param string $expected_text   Expected text output.
 	 *
 	 * @return void
+	 * @throws ReflectionException If the method doesn't exist.
 	 */
 	public function test_edit_comments_screen_text( string $translated_text, string $original_text, bool $is_review, bool $is_reply, string $expected_text ) : void {
 		global $comment;
@@ -226,7 +231,12 @@ class ReviewsTest extends WC_Unit_Test_Case {
 			$comment = $is_reply ? $reply : $review; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
 
-		$this->assertSame( $expected_text, ( new Reviews() )->edit_comments_screen_text( $translated_text, $original_text ) );
+		$reviews = new Reviews();
+
+		$method = ( new ReflectionClass( $reviews ) )->getMethod( 'edit_comments_screen_text' );
+		$method->setAccessible( true );
+
+		$this->assertSame( $expected_text, $method->invoke( $reviews, $translated_text, $original_text ) );
 	}
 
 	/** @see test_edit_comments_screen_text */
@@ -531,7 +541,10 @@ test2</p></div>',
 		$mock->expects( $this->exactly( (int) $should_call_the_display_method ) )
 			->method( 'maybe_display_reviews_bulk_action_notice' );
 
-		$mock->display_notices();
+		$method = ( new ReflectionClass( $mock ) )->getMethod( 'display_notices' );
+		$method->setAccessible( true );
+
+		$method->invoke( $mock );
 	}
 
 	/** @see test_display_notices */
