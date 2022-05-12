@@ -52,9 +52,9 @@ class Reviews {
 		add_action( 'wp_ajax_edit-comment', function() { $this->handle_edit_review(); }, -1 ); // phpcs:ignore Generic.Formatting.DisallowMultipleStatements.SameLine, PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket, Generic.Functions.OpeningFunctionBraceKernighanRitchie.ContentAfterBrace
 		add_action( 'wp_ajax_replyto-comment', function() { $this->handle_reply_to_review(); }, -1 ); // phpcs:ignore Generic.Formatting.DisallowMultipleStatements.SameLine, PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket, Generic.Functions.OpeningFunctionBraceKernighanRitchie.ContentAfterBrace
 
-		add_filter( 'parent_file', function() { $this->edit_review_parent_file(); } ); // phpcs:ignore Generic.Formatting.DisallowMultipleStatements.SameLine, PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket, Generic.Functions.OpeningFunctionBraceKernighanRitchie.ContentAfterBrace
+		add_filter( 'parent_file', function( $parent_file ) { $this->edit_review_parent_file( $parent_file ); } ); // phpcs:ignore Generic.Formatting.DisallowMultipleStatements.SameLine, PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket, Generic.Functions.OpeningFunctionBraceKernighanRitchie.ContentAfterBrace
 
-		add_filter( 'gettext', function() { $this->edit_comments_screen_text(); }, 10, 2 ); // phpcs:ignore Generic.Formatting.DisallowMultipleStatements.SameLine, PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket, Generic.Functions.OpeningFunctionBraceKernighanRitchie.ContentAfterBrace
+		add_filter( 'gettext', function( $translation, $text ) { $this->edit_comments_screen_text( $translation, $text ); }, 10, 2 ); // phpcs:ignore Generic.Formatting.DisallowMultipleStatements.SameLine, PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket, Generic.Functions.OpeningFunctionBraceKernighanRitchie.ContentAfterBrace
 
 		add_action( 'admin_notices', function() { $this->display_notices(); } ); // phpcs:ignore Generic.Formatting.DisallowMultipleStatements.SameLine, PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket, Generic.Functions.OpeningFunctionBraceKernighanRitchie.ContentAfterBrace
 	}
