@@ -45,6 +45,7 @@ class ReviewsCommentsOverridesTest extends WC_Unit_Test_Case {
 	 * @param bool   $should_display_notices Whether notices should be displayed.
 	 *
 	 * @return void
+	 * @throws ReflectionException If the method doesn't exist.
 	 */
 	public function test_display_notices( string $current_screen_base, bool $should_display_notices ) : void {
 		global $current_screen;
@@ -64,7 +65,10 @@ class ReviewsCommentsOverridesTest extends WC_Unit_Test_Case {
 		};
 		// phpcs:enable Squiz.Commenting
 
-		$instance->display_notices();
+		$method = ( new ReflectionClass( $instance ) )->getMethod( 'display_notices' );
+		$method->setAccessible( true );
+
+		$method->invoke( $instance );
 
 		$this->assertSame( (int) $should_display_notices, $instance->maybe_display_reviews_moved_notice_called );
 	}
@@ -212,9 +216,15 @@ class ReviewsCommentsOverridesTest extends WC_Unit_Test_Case {
 	 * @param string $expected_capability The expected capability.
 	 *
 	 * @return void
+	 * @throws ReflectionException If the method doesn't exist.
 	 */
 	public function test_get_dismiss_capability( string $default_capability, string $notice_name, string $expected_capability ) : void {
-		$this->assertSame( $expected_capability, ReviewsCommentsOverrides::get_instance()->get_dismiss_capability( $default_capability, $notice_name ) );
+		$instance = ReviewsCommentsOverrides::get_instance();
+
+		$method = ( new ReflectionClass( $instance ) )->getMethod( 'get_dismiss_capability' );
+		$method->setAccessible( true );
+
+		$this->assertSame( $expected_capability, $method->invoke( $instance, $default_capability, $notice_name ) );
 	}
 
 	/** @see test_get_dismiss_capability() */
@@ -229,6 +239,7 @@ class ReviewsCommentsOverridesTest extends WC_Unit_Test_Case {
 	 * @covers \Automattic\WooCommerce\Internal\Admin\ProductReviews\ReviewsCommentsOverrides::exclude_reviews_from_comments()
 	 *
 	 * @return void
+	 * @throws ReflectionException If the method doesn't exist.
 	 */
 	public function test_exclude_reviews_from_comments() : void {
 		$overrides = new ReviewsCommentsOverrides();
@@ -239,7 +250,10 @@ class ReviewsCommentsOverridesTest extends WC_Unit_Test_Case {
 
 		$this->assertTrue( in_array( 'product', $original_args['post_type'] ) );
 
-		$new_args = $overrides->exclude_reviews_from_comments( $original_args );
+		$method = ( new ReflectionClass( $overrides ) )->getMethod( 'exclude_reviews_from_comments' );
+		$method->setAccessible( true );
+
+		$new_args = $method->invoke( $overrides, $original_args );
 
 		$this->assertFalse( in_array( 'product', $new_args['post_type'] ) );
 	}
