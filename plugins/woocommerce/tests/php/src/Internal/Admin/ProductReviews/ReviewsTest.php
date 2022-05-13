@@ -82,7 +82,9 @@ class ReviewsTest extends WC_Unit_Test_Case {
 
 		$this->assertNull( $list_table_property->getValue( $reviews ) );
 
-		$reviews->load_reviews_screen();
+		$method  = ( new ReflectionClass( $reviews ) )->getMethod( 'load_reviews_screen' );
+		$method->setAccessible( true );
+		$method->invoke( $reviews );
 
 		$this->assertInstanceOf( ReviewsListTable::class, $list_table_property->getValue( $reviews ) );
 	}
@@ -182,7 +184,7 @@ class ReviewsTest extends WC_Unit_Test_Case {
 		$method = ( new ReflectionClass( $reviews ) )->getMethod( 'edit_review_parent_file' );
 		$method->setAccessible( true );
 
-		$this->assertSame( 'edit.php?post_type=product', $method->invoke( $method, 'test' ) );
+		$this->assertSame( 'edit.php?post_type=product', $method->invoke( $reviews, 'test' ) );
 		$this->assertSame( 'product-reviews', $submenu_file );
 	}
 
@@ -220,17 +222,22 @@ class ReviewsTest extends WC_Unit_Test_Case {
 			$comment = $is_reply ? $reply : $review; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
 
-		$this->assertSame( $expected_text, ( wc_get_container()->get( Reviews::class ) )->edit_comments_screen_text( $translated_text, $original_text ) );
+		$reviews = ( wc_get_container()->get( Reviews::class ) );
+
+		$method = ( new ReflectionClass( $reviews ) )->getMethod( 'edit_review_parent_file' );
+		$method->setAccessible( true );
+
+		$this->assertSame( $expected_text, $method->invoke( $reviews, $translated_text, $original_text ) );
 	}
 
 	/** @see test_edit_comments_screen_text */
 	public function data_provider_edit_comments_screen_text() : Generator {
 		yield 'Regular comment' => [ 'Edit Comment', 'Edit Comment', false, false, 'Edit Comment' ];
 		yield 'Not the expected text'  => [ 'Foo', 'Bar', true, false, 'Foo' ];
-		yield 'Edit Review' => [ 'Edit Comment Translated', 'Edit Comment', true, false, 'Edit Review' ];
-		yield 'Edit Review Reply' => [ 'Edit Comment Translated', 'Edit Comment', true, true, 'Edit Review Reply' ];
-		yield 'Moderate Review' => [ 'Moderate Comment Translated', 'Moderate Comment', true, false, 'Moderate Review' ];
-		yield 'Moderate Review Reply' => [ 'Moderate Comment Translated', 'Moderate Comment', true, true, 'Moderate Review Reply' ];
+		yield 'Edit Review' => [ 'Edit Comment Translated', 'Edit Comment', true, false, 'Edit Comment Translated' ];
+		yield 'Edit Review Reply' => [ 'Edit Comment Translated', 'Edit Comment', true, true, 'Edit Comment Translated' ];
+		yield 'Moderate Review' => [ 'Moderate Comment Translated', 'Moderate Comment', true, false, 'Moderate Comment Translated' ];
+		yield 'Moderate Review Reply' => [ 'Moderate Comment Translated', 'Moderate Comment', true, true, 'Moderate Comment Translated' ];
 	}
 
 	/**
