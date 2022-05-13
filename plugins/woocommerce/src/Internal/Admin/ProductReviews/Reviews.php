@@ -20,13 +20,6 @@ class Reviews {
 	const MENU_SLUG = 'product-reviews';
 
 	/**
-	 * Class instance.
-	 *
-	 * @var Reviews|null instance
-	 */
-	protected static $instance;
-
-	/**
 	 * Reviews page hook name.
 	 *
 	 * @var string|null
@@ -57,20 +50,6 @@ class Reviews {
 		add_filter( 'gettext', function( $translation, $text ) { $this->edit_comments_screen_text( $translation, $text ); }, 10, 2 ); // phpcs:ignore Generic.Formatting.DisallowMultipleStatements.SameLine, PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket, Generic.Functions.OpeningFunctionBraceKernighanRitchie.ContentAfterBrace
 
 		add_action( 'admin_notices', function() { $this->display_notices(); } ); // phpcs:ignore Generic.Formatting.DisallowMultipleStatements.SameLine, PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket, Generic.Functions.OpeningFunctionBraceKernighanRitchie.ContentAfterBrace
-	}
-
-	/**
-	 * Gets the class instance.
-	 *
-	 * @return Reviews instance
-	 */
-	public static function get_instance() : Reviews {
-
-		if ( null === self::$instance ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
 	}
 
 	/**
@@ -178,7 +157,7 @@ class Reviews {
 	 *
 	 * @return void
 	 */
-	private function handle_edit_review(): void {
+	private function handle_edit_review() : void {
 		check_ajax_referer( 'replyto-comment', '_ajax_nonce-replyto-comment' );
 
 		$comment_id = isset( $_POST['comment_ID'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['comment_ID'] ) ) : 0;

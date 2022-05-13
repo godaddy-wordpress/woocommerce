@@ -163,7 +163,7 @@ class ReviewsCommentsOverridesTest extends WC_Unit_Test_Case {
 		$method = $reflection->getMethod( 'should_display_reviews_moved_notice' );
 		$method->setAccessible( true );
 
-		$should_display_notice = $method->invoke( ReviewsCommentsOverrides::get_instance() );
+		$should_display_notice = $method->invoke( wc_get_container()->get( ReviewsCommentsOverrides::class ) );
 
 		$this->assertSame( $expected, $should_display_notice );
 	}
@@ -182,7 +182,7 @@ class ReviewsCommentsOverridesTest extends WC_Unit_Test_Case {
 	 * @throws ReflectionException Thrown when the method does not exist.
 	 */
 	public function test_display_reviews_moved_notice() : void {
-		$overrides = new ReviewsCommentsOverrides();
+		$overrides = wc_get_container()->get( ReviewsCommentsOverrides::class );
 		$method = ( new ReflectionClass( $overrides ) )->getMethod( 'display_reviews_moved_notice' );
 		$method->setAccessible( true );
 
@@ -216,15 +216,9 @@ class ReviewsCommentsOverridesTest extends WC_Unit_Test_Case {
 	 * @param string $expected_capability The expected capability.
 	 *
 	 * @return void
-	 * @throws ReflectionException If the method doesn't exist.
 	 */
 	public function test_get_dismiss_capability( string $default_capability, string $notice_name, string $expected_capability ) : void {
-		$instance = ReviewsCommentsOverrides::get_instance();
-
-		$method = ( new ReflectionClass( $instance ) )->getMethod( 'get_dismiss_capability' );
-		$method->setAccessible( true );
-
-		$this->assertSame( $expected_capability, $method->invoke( $instance, $default_capability, $notice_name ) );
+		$this->assertSame( $expected_capability, wc_get_container()->get( ReviewsCommentsOverrides::class )->get_dismiss_capability( $default_capability, $notice_name ) );
 	}
 
 	/** @see test_get_dismiss_capability() */
@@ -242,7 +236,7 @@ class ReviewsCommentsOverridesTest extends WC_Unit_Test_Case {
 	 * @throws ReflectionException If the method doesn't exist.
 	 */
 	public function test_exclude_reviews_from_comments() : void {
-		$overrides = new ReviewsCommentsOverrides();
+		$overrides = wc_get_container()->get( ReviewsCommentsOverrides::class );
 
 		$original_args = [
 			'post_type' => [ 'product' ],
