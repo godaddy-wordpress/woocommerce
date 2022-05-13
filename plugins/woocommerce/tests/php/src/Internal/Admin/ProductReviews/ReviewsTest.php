@@ -7,6 +7,7 @@ use Automattic\WooCommerce\Internal\Admin\ProductReviews\ReviewsListTable;
 use Generator;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
 use WC_Unit_Test_Case;
 use WP_Comment;
 
@@ -168,6 +169,7 @@ class ReviewsTest extends WC_Unit_Test_Case {
 	 * @covers \Automattic\WooCommerce\Internal\Admin\ProductReviews\Reviews::edit_review_parent_file()
 	 *
 	 * @return void
+	 * @throws ReflectionException If the method doesn't exist.
 	 */
 	public function test_edit_review_parent_file() : void {
 		global $submenu_file, $current_screen;
@@ -176,9 +178,12 @@ class ReviewsTest extends WC_Unit_Test_Case {
 		$review = $this->factory()->comment->create( [ 'comment_post_ID' => $product ] );
 		$current_screen = (object) [ 'id' => 'comment' ]; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$_GET['c'] = $review;
-		$reviews = wc_get_container()->get( Reviews::class );
 
-		$this->assertSame( 'edit.php?post_type=product', $reviews->edit_review_parent_file( 'test' ) );
+		$reviews = wc_get_container()->get( Reviews::class );
+		$method = ( new ReflectionClass( $reviews ) )->getMethod( 'edit_review_parent_file' );
+		$method->setAccessible( true );
+
+		$this->assertSame( 'edit.php?post_type=product', $method->invokeArgs( $reviews, [ 'test' ] ) );
 		$this->assertSame( 'product-reviews', $submenu_file );
 	}
 
@@ -195,9 +200,9 @@ class ReviewsTest extends WC_Unit_Test_Case {
 	 * @param string $expected_text   Expected text output.
 	 *
 	 * @return void
+	 * @throws ReflectionException If the method doesn't exist.
 	 */
 	public function test_edit_comments_screen_text( string $translated_text, string $original_text, bool $is_review, bool $is_reply, string $expected_text ) : void {
-		global $comment;
 
 		$product = $this->factory()->post->create( [ 'post_type' => 'product' ] );
 		$review  = $this->factory()->comment->create_and_get( [ 'comment_post_ID' => $product ] );
@@ -215,7 +220,19 @@ class ReviewsTest extends WC_Unit_Test_Case {
 			$comment = $is_reply ? $reply : $review; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
 
-		$this->assertSame( $expected_text, ( wc_get_container()->get( Reviews::class ) )->edit_comments_screen_text( $translated_text, $original_text ) );
+		$reviews = $this->getMockBuilder( Reviews::class )
+			->disableOriginalConstructor()
+			->setMethods( [ 'get_current_comment' ] )
+			->getMock();
+
+		$reviews->expects( $this->once() )
+			->method( 'get_current_comment' )
+			->willReturn( $comment );
+
+		$method = new ReflectionMethod( $reviews, 'edit_comments_screen_text' );
+		$method->setAccessible( true );
+
+		$this->assertSame( $expected_text, $method->invokeArgs( $reviews, [ $translated_text, $original_text ] ) );
 	}
 
 	/** @see test_edit_comments_screen_text */
@@ -506,6 +523,7 @@ test2</p></div>',
 	 * @param bool $should_call_the_display_method Indicates if the display method should be called.
 	 *
 	 * @return void
+	 * @throws ReflectionException If the method doesn't exist.
 	 */
 	public function test_display_notices( bool $is_reviews_page, bool $should_call_the_display_method ) : void {
 
@@ -520,7 +538,10 @@ test2</p></div>',
 		$mock->expects( $this->exactly( (int) $should_call_the_display_method ) )
 			->method( 'maybe_display_reviews_bulk_action_notice' );
 
-		$mock->display_notices();
+		$method = ( new ReflectionClass( $mock ) )->getMethod( 'display_notices' );
+		$method->setAccessible( true );
+
+		$method->invoke( $mock );
 	}
 
 	/** @see test_display_notices */

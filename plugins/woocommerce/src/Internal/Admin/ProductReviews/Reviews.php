@@ -38,18 +38,58 @@ class Reviews {
 	 */
 	public function __construct() {
 
-		add_action( 'admin_menu', [ $this, 'add_reviews_page' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'load_javascript' ] );
+		add_action(
+			'admin_menu',
+			function() {
+				$this->add_reviews_page();
+			}
+		);
+
+		add_action(
+			'admin_enqueue_scripts',
+			function() {
+				$this->load_javascript();
+			}
+		);
 
 		// These ajax callbacks need a low priority to ensure they run before their WordPress core counterparts.
-		add_action( 'wp_ajax_edit-comment', [ $this, 'handle_edit_review' ], -1 );
-		add_action( 'wp_ajax_replyto-comment', [ $this, 'handle_reply_to_review' ], -1 );
+		add_action(
+			'wp_ajax_edit-comment',
+			function() {
+				$this->handle_edit_review();
+			},
+			-1
+		);
+		add_action(
+			'wp_ajax_replyto-comment',
+			function() {
+				$this->handle_reply_to_review();
+			},
+			-1
+		);
 
-		add_filter( 'parent_file', [ $this, 'edit_review_parent_file' ] );
+		add_filter(
+			'parent_file',
+			function( $parent_file ) {
+				$this->edit_review_parent_file( $parent_file );
+			}
+		);
 
-		add_filter( 'gettext', [ $this, 'edit_comments_screen_text' ], 10, 2 );
+		add_filter(
+			'gettext',
+			function( $translation, $text ) {
+				$this->edit_comments_screen_text( $translation, $text );
+			},
+			10,
+			2
+		);
 
-		add_action( 'admin_notices', [ $this, 'display_notices' ] );
+		add_action(
+			'admin_notices',
+			function() {
+				$this->display_notices();
+			}
+		);
 	}
 
 	/**
@@ -76,7 +116,7 @@ class Reviews {
 	 *
 	 * @return void
 	 */
-	public function add_reviews_page() : void {
+	private function add_reviews_page() : void {
 
 		$this->reviews_page_hook = add_submenu_page(
 			'edit.php?post_type=product',
@@ -123,7 +163,7 @@ class Reviews {
 	 *
 	 * @return void
 	 */
-	public function load_javascript() : void {
+	private function load_javascript() : void {
 		if ( $this->is_reviews_page() ) {
 			wp_enqueue_script( 'admin-comments' );
 			enqueue_comment_hotkeys_js();
@@ -157,7 +197,7 @@ class Reviews {
 	 *
 	 * @return void
 	 */
-	public function handle_edit_review(): void {
+	private function handle_edit_review() : void {
 		check_ajax_referer( 'replyto-comment', '_ajax_nonce-replyto-comment' );
 
 		$comment_id = isset( $_POST['comment_ID'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['comment_ID'] ) ) : 0;
@@ -224,7 +264,7 @@ class Reviews {
 	 *
 	 * @return void
 	 */
-	public function handle_reply_to_review() : void {
+	private function handle_reply_to_review() : void {
 		check_ajax_referer( 'replyto-comment', '_ajax_nonce-replyto-comment' );
 
 		$comment_post_ID = isset( $_POST['comment_post_ID'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['comment_post_ID'] ) ) : 0; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
@@ -365,7 +405,7 @@ class Reviews {
 	 *
 	 * @return void
 	 */
-	public function display_notices() : void {
+	private function display_notices() : void {
 
 		if ( $this->is_reviews_page() ) {
 			$this->maybe_display_reviews_bulk_action_notice();
@@ -469,9 +509,9 @@ class Reviews {
 	 * @global string $submenu_file
 	 *
 	 * @param string|mixed $parent_file Parent menu item.
-	 * @return string
+	 * @return string|mixed
 	 */
-	public function edit_review_parent_file( $parent_file ) {
+	private function edit_review_parent_file( $parent_file ) {
 		global $submenu_file, $current_screen;
 
 		if ( isset( $current_screen->id, $_GET['c'] ) && 'comment' === $current_screen->id ) {
@@ -493,14 +533,25 @@ class Reviews {
 	}
 
 	/**
+	 * Gets the current comment in context.
+	 *
+	 * @return WP_Comment|null
+	 */
+	protected function get_current_comment() : ?WP_Comment {
+		global $comment;
+
+		return $comment instanceof WP_Comment ? $comment : null;
+	}
+
+	/**
 	 * Replaces Edit/Moderate Comment title/headline with Edit Review, when editing/moderating a review.
 	 *
 	 * @param  string|mixed $translation Translated text.
 	 * @param  string|mixed $text        Text to translate.
 	 * @return string|mixed              Translated text.
 	 */
-	public function edit_comments_screen_text( $translation, $text ) {
-		global $comment;
+	private function edit_comments_screen_text( $translation, $text ) {
+		$comment = $this->get_current_comment();
 
 		// Bail out if not a text we should replace.
 		if ( ! in_array( $text, [ 'Edit Comment', 'Moderate Comment' ], true ) ) {
