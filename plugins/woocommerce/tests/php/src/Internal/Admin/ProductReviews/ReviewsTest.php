@@ -7,6 +7,7 @@ use Automattic\WooCommerce\Internal\Admin\ProductReviews\ReviewsListTable;
 use Generator;
 use ReflectionClass;
 use ReflectionException;
+use stdClass;
 use WC_Unit_Test_Case;
 use WP_Comment;
 
@@ -49,6 +50,8 @@ class ReviewsTest extends WC_Unit_Test_Case {
 	public function test_get_view_page_capability() : void {
 
 		$this->assertEquals( 'moderate_comments', Reviews::get_capability() );
+		$this->assertEquals( 'moderate_comments', Reviews::get_capability( 'view' ) );
+		$this->assertEquals( 'edit_products', Reviews::get_capability( 'moderate' ) );
 
 		$callback = function() {
 			return 'manage_woocommerce';
@@ -621,6 +624,16 @@ test2</p></div>',
 			]
 		);
 		$this->assertTrue( $method->invoke( $reviews, $review_reply ) );
+
+		$callback = function() {
+			return true;
+		};
+
+		add_filter( 'woocommerce_product_reviews_is_product_review_or_reply', $callback );
+
+		$this->assertTrue( $method->invoke( $reviews, new stdClass() ) );
+
+		remove_filter( 'woocommerce_product_reviews_is_product_review_or_reply', $callback );
 	}
 
 	/**

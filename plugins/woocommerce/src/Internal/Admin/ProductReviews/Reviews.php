@@ -63,12 +63,14 @@ class Reviews {
 		/**
 		 * Filters whether the current user can manage product reviews.
 		 *
+		 * This is aligned to {@see \wc_rest_check_product_reviews_permissions()}
+		 *
 		 * @since 6.6.0
 		 *
-		 * @param string $capability The capability (defaults to `moderate_comments`).
+		 * @param string $capability The capability (defaults to `moderate_comments` for viewing and `edit_products` for editing).
 		 * @param string $context    The context for which the capability is needed.
 		 */
-		return (string) apply_filters( 'woocommerce_product_reviews_page_capability', 'moderate_comments', $context );
+		return (string) apply_filters( 'woocommerce_product_reviews_page_capability', 'view' === $context ? 'moderate_comments' : 'edit_products', $context );
 	}
 
 	/**
@@ -133,15 +135,22 @@ class Reviews {
 	/**
 	 * Determines if the object is a review or a reply to a review.
 	 *
-	 * @param WP_Comment|array|null $object Object to check.
+	 * @param WP_Comment|mixed $object Object to check.
 	 * @return bool
 	 */
 	protected function is_review_or_reply( $object ) : bool {
-		if ( ! $object instanceof WP_Comment ) {
-			return false;
-		}
 
-		return 'review' === $object->comment_type || 'product' === get_post_type( $object->comment_post_ID );
+		$is_review_or_reply = $object instanceof WP_Comment && in_array( $object->comment_type, [ 'review', 'comment' ], true ) && 'product' === get_post_type( $object->comment_post_ID );
+
+		/**
+		 * Filters whether the object is a review or a reply to a review.
+		 *
+		 * @since 6.6.0
+		 *
+		 * @param bool             $is_review_or_reply Whether the object in context is a review or a reply to a review.
+		 * @param WP_Comment|mixed $object             The object in context.
+		 */
+		return (bool) apply_filters( 'woocommerce_product_reviews_is_product_review_or_reply', $is_review_or_reply, $object );
 	}
 
 	/**
